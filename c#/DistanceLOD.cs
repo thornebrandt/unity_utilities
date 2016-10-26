@@ -3,13 +3,21 @@ using System.Collections;
 
 public class DistanceLOD : MonoBehaviour {
 	public float[] distanceRanges;
-	public GameObject[] LODModels;
+	public GameObject[] LODModels // a collection of groups.
+	public GameObject mask
+	// mask is meant to be a group of colliders
+	// in which the objects are only active within.
+	// use mask if occlusion isn't behaving correctly.
 	public Camera cam;
 	private Renderer[][] rends;
-	private int current = -2;
+	private Bounds[] bounds;
+	private int current;
+	private int level;
+	private Vector3 camPosition;
 
 	void Start () {
 		collectRenderers();
+		collectMaskBounds();
 		turnOffEverything();
 	}
 
@@ -20,13 +28,44 @@ public class DistanceLOD : MonoBehaviour {
 		}
 	}
 
-	void Update(){
-		checkCameraPosition();
+	void collectMaskBounds(){
+		if(mask != null){
+			Collider[] colliders = mask.GetComponentsInChildren<Collider>();
+			bounds = new Bounds[colliders.Length];
+			for(int i = 0; i < bounds.Length; i++){
+				bounds[i] = colliders[i].bounds;
+			}
+		}
 	}
 
-	void checkCameraPosition(){
+	void Update(){
+		if(checkMask()){
+			showLOD();
+		} else {
+			turnOffEverything();
+		}
+	}
+
+	bool checkMask(){
+		if(bounds != null && bounds.Length > 0){
+			camPosition = cam.transform.position;
+			bool found = false;
+			for(int i = 0; i < bounds.Length; i++){
+				if(bounds[i].Contains(camPosition)){
+					print("found");
+					found = true;
+				}
+			}
+			return found;
+		} else {
+			return true;
+		}
+	}
+
+
+	void showLOD(){
 		float d = Vector3.Distance(cam.transform.position, transform.position);
-		int level = -1;
+		level = -1;
 		for(int i = 0; i < distanceRanges.Length; i++){
 			if(d < distanceRanges[i]){
 				level = i;
@@ -55,6 +94,7 @@ public class DistanceLOD : MonoBehaviour {
 		for(int i = 0; i < LODModels.Length; i++){
 			turnOff(i);
 		}
+		current = -2;
 	}
 
 	void turnOn(int i){
