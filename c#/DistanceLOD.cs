@@ -3,8 +3,9 @@ using System.Collections;
 
 public class DistanceLOD : MonoBehaviour {
 	public float[] distanceRanges;
-	public GameObject[] LODModels // a collection of groups.
-	public GameObject mask
+	//Tip: Length of distanceRanges should be one less than LODModels. ( they are edges in between )
+	public GameObject[] LODModels;
+	public GameObject mask;
 	// mask is meant to be a group of colliders
 	// in which the objects are only active within.
 	// use mask if occlusion isn't behaving correctly.
