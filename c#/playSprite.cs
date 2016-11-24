@@ -15,8 +15,6 @@ public class playSprite : MonoBehaviour {
 	private int index;
 	private bool playing = true;
 
-
-
 	void Start(){
 		if(autoPlay == true){
 			playing = true;
@@ -40,14 +38,15 @@ public class playSprite : MonoBehaviour {
 
 
 	void animateSprite(){
+		if(!loop && index >= totalCells - 1){
+			playing = false;
+		}
+
 		if(index >= (totalCells - 1)){
 			index = 0;
 		}
 		if(Time.frameCount % stops == 0){
 			index = getNextInLoop(index);
-		}
-		if(loop == false && index == 0){
-			playing = false;
 		}
 		float sizeX = 1.0f / colCount;
 		float sizeY = 1.0f / rowCount;
